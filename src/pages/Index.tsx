@@ -3,6 +3,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 
 interface Item {
@@ -12,39 +14,51 @@ interface Item {
   category: string;
   icon: string;
   rarity?: string;
+  details?: {
+    type?: string;
+    health?: number;
+    damage?: number;
+    durability?: number;
+    stackable?: number;
+    craftingTime?: string;
+    ingredients?: string[];
+    temperature?: string;
+    structures?: string[];
+    drops?: string[];
+  };
 }
 
 const minecraftData: Item[] = [
-  { id: 'b1', name: 'Камень', description: 'Основной строительный блок, добывается киркой', category: 'blocks', icon: '🪨', rarity: 'common' },
-  { id: 'b2', name: 'Дерево', description: 'Используется для крафта и строительства', category: 'blocks', icon: '🪵', rarity: 'common' },
-  { id: 'b3', name: 'Алмазный блок', description: 'Редкий декоративный блок из 9 алмазов', category: 'blocks', icon: '💎', rarity: 'legendary' },
+  { id: 'b1', name: 'Камень', description: 'Основной строительный блок, добывается киркой', category: 'blocks', icon: '🪨', rarity: 'common', details: { type: 'Твёрдый блок', durability: 30, stackable: 64 } },
+  { id: 'b2', name: 'Дерево', description: 'Используется для крафта и строительства', category: 'blocks', icon: '🪵', rarity: 'common', details: { type: 'Природный блок', durability: 10, stackable: 64 } },
+  { id: 'b3', name: 'Алмазный блок', description: 'Редкий декоративный блок из 9 алмазов', category: 'blocks', icon: '💎', rarity: 'legendary', details: { type: 'Декоративный блок', durability: 30, stackable: 64 } },
   { id: 'b4', name: 'Стекло', description: 'Прозрачный блок для окон и декора', category: 'blocks', icon: '🔲', rarity: 'common' },
   { id: 'b5', name: 'Земля', description: 'Блок для садоводства и ландшафта', category: 'blocks', icon: '🟫', rarity: 'common' },
   { id: 'b6', name: 'Обсидиан', description: 'Прочный блок для портала в Ад', category: 'blocks', icon: '⬛', rarity: 'rare' },
   
-  { id: 'i1', name: 'Алмазный меч', description: 'Мощное оружие ближнего боя', category: 'items', icon: '⚔️', rarity: 'epic' },
-  { id: 'i2', name: 'Кирка', description: 'Инструмент для добычи камня и руды', category: 'items', icon: '⛏️', rarity: 'common' },
-  { id: 'i3', name: 'Хлеб', description: 'Восстанавливает 5 единиц голода', category: 'items', icon: '🍞', rarity: 'common' },
+  { id: 'i1', name: 'Алмазный меч', description: 'Мощное оружие ближнего боя', category: 'items', icon: '⚔️', rarity: 'epic', details: { type: 'Оружие', damage: 7, durability: 1561, stackable: 1 } },
+  { id: 'i2', name: 'Кирка', description: 'Инструмент для добычи камня и руды', category: 'items', icon: '⛏️', rarity: 'common', details: { type: 'Инструмент', durability: 250, stackable: 1 } },
+  { id: 'i3', name: 'Хлеб', description: 'Восстанавливает 5 единиц голода', category: 'items', icon: '🍞', rarity: 'common', details: { type: 'Еда', health: 5, stackable: 64 } },
   { id: 'i4', name: 'Зелье лечения', description: 'Мгновенно восстанавливает здоровье', category: 'items', icon: '🧪', rarity: 'rare' },
   { id: 'i5', name: 'Удочка', description: 'Используется для ловли рыбы', category: 'items', icon: '🎣', rarity: 'common' },
   { id: 'i6', name: 'Энергетический кристалл', description: 'Редкий ресурс для крафта', category: 'items', icon: '🔮', rarity: 'legendary' },
   
-  { id: 'm1', name: 'Крипер', description: 'Взрывается при приближении к игроку', category: 'mobs', icon: '💥', rarity: 'common' },
-  { id: 'm2', name: 'Зомби', description: 'Враждебный моб, атакует ночью', category: 'mobs', icon: '🧟', rarity: 'common' },
-  { id: 'm3', name: 'Эндермен', description: 'Телепортируется и атакует при взгляде', category: 'mobs', icon: '👾', rarity: 'epic' },
+  { id: 'm1', name: 'Крипер', description: 'Взрывается при приближении к игроку', category: 'mobs', icon: '💥', rarity: 'common', details: { type: 'Враждебный', health: 20, damage: 49, drops: ['Порох', 'Пластинка'] } },
+  { id: 'm2', name: 'Зомби', description: 'Враждебный моб, атакует ночью', category: 'mobs', icon: '🧟', rarity: 'common', details: { type: 'Враждебный', health: 20, damage: 3, drops: ['Гнилая плоть', 'Железо'] } },
+  { id: 'm3', name: 'Эндермен', description: 'Телепортируется и атакует при взгляде', category: 'mobs', icon: '👾', rarity: 'epic', details: { type: 'Нейтральный', health: 40, damage: 7, drops: ['Жемчуг Края'] } },
   { id: 'm4', name: 'Корова', description: 'Дружелюбный моб, дает молоко и кожу', category: 'mobs', icon: '🐄', rarity: 'common' },
   { id: 'm5', name: 'Дракон Края', description: 'Финальный босс игры', category: 'mobs', icon: '🐉', rarity: 'legendary' },
   { id: 'm6', name: 'Скелет', description: 'Стреляет из лука на расстоянии', category: 'mobs', icon: '💀', rarity: 'common' },
   
-  { id: 'r1', name: 'Верстак', description: 'Крафт: 4 доски дерева', category: 'recipes', icon: '🔨', rarity: 'common' },
-  { id: 'r2', name: 'Меч', description: 'Крафт: 2 доски + 1 палка', category: 'recipes', icon: '⚔️', rarity: 'common' },
+  { id: 'r1', name: 'Верстак', description: 'Крафт: 4 доски дерева', category: 'recipes', icon: '🔨', rarity: 'common', details: { craftingTime: 'Мгновенно', ingredients: ['4x Доски дерева'] } },
+  { id: 'r2', name: 'Меч', description: 'Крафт: 2 доски + 1 палка', category: 'recipes', icon: '⚔️', rarity: 'common', details: { craftingTime: 'Мгновенно', ingredients: ['2x Доски', '1x Палка'] } },
   { id: 'r3', name: 'Факел', description: 'Крафт: 1 уголь + 1 палка', category: 'recipes', icon: '🔥', rarity: 'common' },
   { id: 'r4', name: 'Печь', description: 'Крафт: 8 булыжника', category: 'recipes', icon: '🏭', rarity: 'common' },
   { id: 'r5', name: 'Кровать', description: 'Крафт: 3 доски + 3 шерсти', category: 'recipes', icon: '🛏️', rarity: 'common' },
   { id: 'r6', name: 'Книжная полка', description: 'Крафт: 6 досок + 3 книги', category: 'recipes', icon: '📚', rarity: 'rare' },
   
-  { id: 'bio1', name: 'Равнины', description: 'Плоский биом с травой и деревьями', category: 'biomes', icon: '🌾', rarity: 'common' },
-  { id: 'bio2', name: 'Пустыня', description: 'Песчаный биом с кактусами', category: 'biomes', icon: '🏜️', rarity: 'common' },
+  { id: 'bio1', name: 'Равнины', description: 'Плоский биом с травой и деревьями', category: 'biomes', icon: '🌾', rarity: 'common', details: { temperature: 'Умеренная', structures: ['Деревни', 'Аванпосты'] } },
+  { id: 'bio2', name: 'Пустыня', description: 'Песчаный биом с кактусами', category: 'biomes', icon: '🏜️', rarity: 'common', details: { temperature: 'Высокая', structures: ['Храмы', 'Деревни', 'Колодцы'] } },
   { id: 'bio3', name: 'Джунгли', description: 'Густой лес с высокими деревьями', category: 'biomes', icon: '🌴', rarity: 'rare' },
   { id: 'bio4', name: 'Тайга', description: 'Холодный биом с елями', category: 'biomes', icon: '🌲', rarity: 'common' },
   { id: 'bio5', name: 'Грибной остров', description: 'Редкий биом с гигантскими грибами', category: 'biomes', icon: '🍄', rarity: 'legendary' },
@@ -76,6 +90,7 @@ const rarityNames = {
 function Index() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const filteredData = minecraftData.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -146,7 +161,7 @@ function Index() {
           <TabsContent value={activeTab} className="mt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredData.map((item) => (
-                <Card key={item.id} className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1 cursor-pointer">
+                <Card key={item.id} className="hover:shadow-lg transition-all duration-200 hover:-translate-y-1 cursor-pointer" onClick={() => setSelectedItem(item)}>
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <div className="text-5xl">{item.icon}</div>
@@ -187,6 +202,143 @@ function Index() {
           <p>Minecraft Wiki © 2024 • Неофициальный справочник по игре</p>
         </div>
       </footer>
+
+      <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
+        <DialogContent className="max-w-2xl">
+          {selectedItem && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-4">
+                  <div className="text-6xl">{selectedItem.icon}</div>
+                  <div className="flex-1">
+                    <DialogTitle className="text-2xl mb-2">{selectedItem.name}</DialogTitle>
+                    <div className="flex items-center gap-2">
+                      {selectedItem.rarity && (
+                        <Badge className={rarityColors[selectedItem.rarity]} variant="secondary">
+                          {rarityNames[selectedItem.rarity]}
+                        </Badge>
+                      )}
+                      <Badge variant="outline">
+                        {categoryNames[selectedItem.category as keyof typeof categoryNames]}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <Separator className="my-4" />
+
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                    <Icon name="FileText" size={16} />
+                    Описание
+                  </h4>
+                  <p className="text-foreground">{selectedItem.description}</p>
+                </div>
+
+                {selectedItem.details && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {selectedItem.details.type && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1">Тип</div>
+                        <div className="font-medium">{selectedItem.details.type}</div>
+                      </div>
+                    )}
+                    {selectedItem.details.health !== undefined && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1">Здоровье</div>
+                        <div className="font-medium flex items-center gap-1">
+                          <Icon name="Heart" size={16} className="text-red-500" />
+                          {selectedItem.details.health}
+                        </div>
+                      </div>
+                    )}
+                    {selectedItem.details.damage !== undefined && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1">Урон</div>
+                        <div className="font-medium flex items-center gap-1">
+                          <Icon name="Sword" size={16} className="text-orange-500" />
+                          {selectedItem.details.damage}
+                        </div>
+                      </div>
+                    )}
+                    {selectedItem.details.durability !== undefined && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1">Прочность</div>
+                        <div className="font-medium">{selectedItem.details.durability}</div>
+                      </div>
+                    )}
+                    {selectedItem.details.stackable !== undefined && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1">Стакается</div>
+                        <div className="font-medium">{selectedItem.details.stackable}</div>
+                      </div>
+                    )}
+                    {selectedItem.details.craftingTime && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1">Время крафта</div>
+                        <div className="font-medium">{selectedItem.details.craftingTime}</div>
+                      </div>
+                    )}
+                    {selectedItem.details.temperature && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <div className="text-xs text-muted-foreground mb-1">Температура</div>
+                        <div className="font-medium">{selectedItem.details.temperature}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {selectedItem.details?.ingredients && (
+                  <div>
+                    <h4 className="font-semibold text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                      <Icon name="List" size={16} />
+                      Ингредиенты
+                    </h4>
+                    <ul className="space-y-1">
+                      {selectedItem.details.ingredients.map((ingredient, i) => (
+                        <li key={i} className="flex items-center gap-2 text-sm">
+                          <Icon name="ChevronRight" size={14} className="text-primary" />
+                          {ingredient}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {selectedItem.details?.structures && (
+                  <div>
+                    <h4 className="font-semibold text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                      <Icon name="Home" size={16} />
+                      Структуры
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedItem.details.structures.map((structure, i) => (
+                        <Badge key={i} variant="outline">{structure}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedItem.details?.drops && (
+                  <div>
+                    <h4 className="font-semibold text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                      <Icon name="Gift" size={16} />
+                      Дроп
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedItem.details.drops.map((drop, i) => (
+                        <Badge key={i} variant="secondary">{drop}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
